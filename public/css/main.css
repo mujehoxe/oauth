@@ -1,0 +1,46 @@
+
+
+body {
+    background-color: black;   
+    display: grid;	  
+    grid-template-columns: 1fr 2fr;
+}
+
+.right{
+  display: grid;
+  grid-template-columns: 1fr, 1fr;
+  grid-template-rows: 1fr, 1fr;
+  justify-self: end;
+  width:100vh;
+  height:100vh;
+}
+
+.rect{
+  background-color: white;
+  width:50vh;
+  height:50vh;
+}
+
+.rect:nth-child(0){
+  grid-row-start: 1;
+  grid-column-start: 1;
+}
+
+.rect:nth-child(1){
+  grid-row-start: 2;
+  grid-column-start: 2;
+}
+
+.left{
+  display: grid;
+  height: 100vh;
+  grid-template-rows: 3fr 1fr;
+}
+
+.buttons {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	grid-gap: 5px;
+  margin-left: 10vh;
+  align-content: center;
+}

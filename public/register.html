@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/lognin.css">
+</head>
+<body>
+
+    <p class="Paragraph">
+        Register
+    </p>
+
+    <div class="form">
+
+        <input id="username" type="text" class="Credentials" placeholder="Username">
+        <input id="email" type="email" class="Credentials" placeholder="Email">
+        <input type="password" class="Credentials" id="password" placeholder="Password">
+        <input type="password" class="Credentials" id="ConfimPassword" placeholder="Confirm your password">            
+        
+        <button id="submit" class="button" style="justify-self: end;">SignUp</button>
+  
+        <a href='login.html' class="Paragraph" style="font-size: 3vh;color: rgb(100, 120, 150);margin: 0;">
+            Don't have an account, join here.
+        </a>
+        <a href='/auth/google' class="Paragraph" style="font-size: 3vh;color: rgb(100, 120, 150);margin: 0;">
+            Use Google.
+        </a> 
+    
+    </div>
+    <script src="./scripts/src/request.js"></script>
+    <script src="./scripts/src/register.js"></script>
+</body>
+</html>

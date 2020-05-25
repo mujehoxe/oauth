@@ -1,0 +1,58 @@
+
+@font-face {
+	font-family: MyriadPro;
+	src: url('MyriadPro.otf');
+    font-weight: bold;
+    font-display: fallback;
+}
+
+body, html {
+  height: 100vh;
+  margin: 0;
+  background-color: black;
+}
+
+.button {
+    font-size: calc(2vh + 10px);
+    color: silver;
+    border: unset;
+    background: unset;
+    text-align: left;
+    font-family: MyriadPro;
+    padding:0;
+    text-decoration: none;
+}
+.button:active {
+    text-decoration: none;
+    fill: lightblue solid 2px;
+    fill-opacity: 50%;
+}
+.button:hover {
+    text-decoration: none;
+    border: lightblue solid 2px
+}
+
+.Paragraph {
+	font-family: MyriadPro;
+	line-height: 1.2;
+    text-align: left;
+    align-self: center;
+    margin-left: 10vh;
+	color: white;
+    font-size: 14vh;
+}
+
+.Credentials{
+    
+    border: unset;
+    border-bottom: solid #708090 2px;
+
+    color: slategrey;
+    
+    font-size: calc(1vh + 10px);
+    font-family: MyriadPro;       
+}
+.Credentials::placeholder{
+    color: slategrey;
+    opacity: .9;
+}

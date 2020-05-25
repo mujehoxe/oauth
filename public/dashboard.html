@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+
+    <div class="Profile Social" style="grid-column: 1/3"></div>
+    <img src=".\assets\profileimage.png" alt="" class="ProfileImage">
+    <div class="Infos">
+        <div class="Info"><span class="NormalCharacterStyle">UserName: </span><span id="username" >Jhdsl URHh</span></div>
+        <div class="Info"><span class="NormalCharacterStyle">Age: </span><span id="age" >23</span></div>
+        <div class="Info"><span class="NormalCharacterStyle">Country: </span><span id="country" >Jhdsl URHh</span></div>
+        <div class="Info"><span class="NormalCharacterStyle">Level: </span><span id="level" >10</span></div>
+    </div>
+    
+
+    <div id='create' class="Card Play" style="grid-column: 1/2"></div>
+    <p class="NormalCharacterStyle" style="grid-column: 1/2">Create a room</p>
+
+    <div id='join' class="Card Play" style="grid-column: 2/3"></div>
+    <span class="NormalCharacterStyle" style="grid-column: 2/3">Join a room</span>
+
+    <div class="Friends Social"></div> 
+    <p class="NormalCharacterStyle" style="grid-column: 3/4">Not ready</p>
+
+    <script src="./scripts/src/request.js"></script>
+    <script src="./scripts/src/dashboard.js"></script>   
+</body>
+</html>
