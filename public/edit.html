@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/form.css">
+</head>
+<body>
+
+    <div class="Left">
+        <p class="Paragraph">
+            Edit
+        </p>
+        <p class="Paragraph" style="font-size: calc(2vh + 10px); color: #c0c0c0;">
+            Change your personal information.
+        </p>
+    </div>
+
+    <div class="Form Right">
+
+        <input id="username" type="text" class="Credentials" placeholder="Username">
+        <input id="age" type="text" class="Credentials" placeholder="Age">
+        <img id="profilePic" src="./assets/profileimage.png" class="ProfileImage" style="width: 100px; height: 100px; justify-self: center">
+        <input type="file" accept="image/*" onchange="loadFile(event)">
+
+        <button id="submitInfo" class="Button" style="justify-self: end;">Submit</button>
+
+
+        <!-- <input type="password" class="Credentials" id="password" placeholder="Old password">
+        <input type="password" class="Credentials" id="password" placeholder="New password">
+        <input type="password" class="Credentials" id="ConfimPassword" placeholder="Confirm your new password">            
+    
+        <button id="submitPass" class="Button" style="justify-self: end;">Submit</button> -->
+    
+    </div>
+    <script src="./scripts/src/request.js"></script>
+    <script src="./scripts/src/edit.js"></script>
+</body>
+</html>

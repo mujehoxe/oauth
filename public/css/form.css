@@ -1,0 +1,24 @@
+
+.Form{
+    background: white;
+    justify-self: end;
+    display: grid;
+    height: 100vh;
+    gap: 5vh;
+    align-content: center;
+    justify-content: center;
+}
+.Credentials{
+    
+    border: unset;
+    border-bottom: solid #708090 2px;
+
+    color: slategrey;
+    
+    font-size: calc(1vh + 10px);
+    font-family: MyriadPro;       
+}
+.Credentials::placeholder{
+    color: slategrey;
+    opacity: .9;
+}

@@ -9,12 +9,20 @@ const verifyLogin = require('./verifyLogin.js')
 
 const passport = require('../passport')
 
+const ObjectId = require('mongodb').ObjectId
+
+const { google } = require('googleapis')
+
+const axios = require('axios')
+
+const fs = require('fs').promises
+
+const crypto = require('crypto');
+
 module.exports = function(app, db) {
 
     const loggedIn = function (req, res, next) {
         if(req.session.userId){
-            console.log(req.session)
-            console.log('you are logged in')
             res.redirect('/dashboard')
             return
         }
@@ -23,8 +31,6 @@ module.exports = function(app, db) {
 
     const loggedOut = function (req, res, next) {
         if(!req.session.userId){
-            console.log(req.session)
-            console.log('you are logged out')
             res.redirect('/login')
             return
         }
@@ -34,14 +40,56 @@ module.exports = function(app, db) {
     app.get('/dashboard', loggedOut, (req, res) => {
         res.sendFile('/dashboard.html', { root: __dirname+ '/../public' })
     })
-    app.post('/dashboard', loggedOut, (req, res) => {
-        
-        console.log(req.body)
-        if(req.body.req === 'create'){
-            res.redirect('/room')
+
+    app.get('/uploads/:id', loggedOut, (req, res) => {
+        res.sendFile(req.params.id, { root: __dirname+ '/../uploads' })
+    })
+    app.get('/edit', loggedOut, (req, res) => {
+        res.sendFile('/edit.html', { root: __dirname + '/../public' })
+    })
+    app.post('/edit', loggedOut, async(req, res) => {
+        const data = {}
+
+        if(req.body.picture){
+            let base64String = req.body.picture;
+            let base64Image = base64String.split(';base64,')
+            let image = base64Image.pop()
+            let extention = base64Image.pop()
+            extention = '.' + extention.slice(extention.indexOf("/") + 1, extention.length)
+
+            const current_date = (new Date()).valueOf().toString();
+            const random = Math.random().toString();
+            const fileName = crypto.createHash('md5').update(current_date + random).digest('hex');
+            
+            path = __dirname + '/../uploads/' + fileName + extention
+            data.picture = './uploads/' + fileName + extention
+
+            fs.writeFile(path, image, {encoding: 'base64'}, function(err) {
+                if(err) { throw err }
+            });
         }
-        if(req.body.req === 'join'){
-            res.redirect('/search')
+
+        if(req.body.username) { data.username = req.body.username }
+
+        if(req.body.age) { data.age = req.body.age }
+
+        if(!(JSON.stringify(data) === '{}'))
+        try{
+            db.collection('users').updateOne(
+                { _id: new ObjectId(req.session.userId) },
+                { $set: data }
+                ,
+                function(err, result) {
+                    if (err) { throw err }
+                    res.send('success')
+                }
+            )
+        }
+        catch{
+            res.send('fail');
+        }
+        else{
+            res.send('fail');
         }
     })
 
@@ -66,8 +114,10 @@ module.exports = function(app, db) {
             const result = await createUser(db, username, email, hash)
             req.session.userId = result.ops[0]._id
             req.session.save()
-            res.redirect(301,'/dashboard')
+            console.log(req.session.userId)
+            res.redirect(302,'/dashboard')
         } catch (err) {
+            console.log(err)
             res.redirect(500, '/registration')
         }
     })
@@ -99,7 +149,7 @@ module.exports = function(app, db) {
                 if(user.hash === hash){
                     req.session.userId = user._id
                     req.session.save()
-                    res.redirect(301,'/dashboard')
+                    res.redirect(302,'/dashboard')
                     return
                 }
             }
@@ -109,56 +159,144 @@ module.exports = function(app, db) {
 
     })
 
-    app.get('/room', loggedOut, (req, res) => {
-        
-        const min = 4000000000000 ,
-                max= 4999999999999
-        let roomId = (Math.floor(Math.random() * (max - min) + min)).toString()
-
-        res.redirect('/room'+roomId)
-    })
-    app.get('/room:id', loggedOut, (req, res) => {
-
-        res.sendFile('/room.html', { root: __dirname+ '/../public' })
-        
-        console.log('id', req.params.id)
-        req.session.roomId = req.params.id
+    app.get('/logout', loggedOut, (req, res) => {
+        db.collection('sessions').deleteOne({ session: JSON.stringify(req.session) } , true)
+        .then(doc => {
+            req.session.userId = null
+            res.send('success')
+        })
     })
 
     app.use(passport.initialize());
     app.use(passport.session());
 
-    app.get('/auth/google', loggedIn, passport.authenticate('google', { 
-        scope: [
+    app.get('/auth/google', loggedIn, (req, res) => {
+        const oauthClient = new google.auth.OAuth2(
+            '374495845688-8ra0nksfosq5s6p91kj7pe40arass74p.apps.googleusercontent.com',
+            'LSE0vXnUaV7_NjTCjnZ6rXJq',
+            'http://127.0.0.1:3000/auth/google/callback'
+        )
+        const scopes = [
             'https://www.googleapis.com/auth/userinfo.profile',
-            'https://www.googleapis.com/auth/userinfo.email'
-        ] 
-    }))
+            'https://www.googleapis.com/auth/userinfo.email',
+            'openid'
+        ]
+        const url = oauthClient.generateAuthUrl({
+            access_type: 'offline',
+            scope: scopes,
+            state: JSON.stringify({
+                callbackUrl: req.body.callbackUrl,
+                userId: req.body.userid
+            })
+        })
+        res.redirect(302,url)
+    })
 
-    app.get('/auth/google/callback', loggedIn,
-        passport.authenticate('google', { failureRedirect: '/dashboard' }),
-        function(req, res) {
-            const googleId = req.user.id
-            const email = req.user._json.email
+    app.get('/contact/google', loggedOut,  (req, res) => {
+        const oauthClient = new google.auth.OAuth2(
+            '374495845688-8ra0nksfosq5s6p91kj7pe40arass74p.apps.googleusercontent.com',
+            'LSE0vXnUaV7_NjTCjnZ6rXJq',
+            'http://127.0.0.1:3000/contact/google/callback'
+        )
+        const scopes = ['https://www.googleapis.com/auth/contacts.readonly']
+        const url = oauthClient.generateAuthUrl({
+            access_type: 'offline',
+            scope: scopes,
+            state: JSON.stringify({
+                callbackUrl: req.body.callbackUrl,
+                userId: req.body.userid
+            })
+        })
+        res.send(url)
+    })
+
+    app.get('/auth/google/callback', loggedIn, async (req, res) => {
+        const code = req.query.code
+        const oauthClient = new google.auth.OAuth2(
+            '374495845688-8ra0nksfosq5s6p91kj7pe40arass74p.apps.googleusercontent.com',
+            'LSE0vXnUaV7_NjTCjnZ6rXJq',
+            'http://127.0.0.1:3000/auth/google/callback'
+        )
         
-            try {
-                db.collection('users').findOneAndUpdate(
-                    { googleId: googleId },
-                    { $setOnInsert: { googleId: googleId, email: email } },
-                    { upsert: true, returnOriginal: false},
+        const { tokens } = await oauthClient.getToken(code)
+        
+        try {
+            const {data} = await axios({
+                method: 'GET',
+                headers:{
+                    authorization: 'Bearer ' + tokens.access_token,
+                },
+                'Content-Type': 'application/json',
+                url: 'https://www.googleapis.com/oauth2/v3/userinfo'
+                })
+    
+                if(data) {
+                    const { googleId, email, picture } = data
 
+                    db.collection('users').findOneAndUpdate(
+                    { googleId: googleId },
+                    { $setOnInsert: { googleId, email, picture} },
+                    { upsert: true, returnOriginal: false}
+                    ,
                     function(err, doc) {
                         if (err) { throw err }
                         req.session.userId = doc.value._id
                         req.session.save()
+                        res.redirect(302,'/dashboard')
                     }
                 )
-            } catch( err ) { console.log(err) }      
-            res.redirect('/dashboard');
+            }
+        } catch (error) {
+            console.log(error)
+            res.redirect(302,'/registration')
+        }      
+    })
+
+    app.get('/contact/google/callback', loggedOut, async (req, res) => {
+        const code = req.query.code
+
+        const oauthClient = new google.auth.OAuth2(
+            '374495845688-8ra0nksfosq5s6p91kj7pe40arass74p.apps.googleusercontent.com',
+            'LSE0vXnUaV7_NjTCjnZ6rXJq',
+            'http://127.0.0.1:3000/contact/google/callback'
+        )
+        const { tokens } = await oauthClient.getToken(code)
+
+        try {
+           const {data} = await axios({
+               method: 'GET',
+               headers:{
+                   authorization: 'Bearer ' + tokens.access_token,
+               },
+               'Content-Type': 'application/json',
+               url: 'https://people.googleapis.com/v1/people/me/connections?personFields=names,emailAddresses,photos'
+            })
+
+            if(data) {
+                const { connections } = data
+                db.collection('users').updateOne(
+                    { _id: new ObjectId(req.session.userId) },
+                    { $set: { connections } }
+                    ,
+                    function(err, res) {
+                        if (err) { throw err }
+                        console.log(res.modifiedCount)
+                    }
+                )
+                res.redirect('/dashboard')
+            } else {
+                console.log('No connections found.');
+            }
+        } catch (error) {
+            console.log(error)
         }
-    );
+    })
 
     
+    app.get('/userInfo', loggedOut, (req, res) => {
+        db.collection('users').findOne({ _id: new ObjectId(req.session.userId) }, { projection: { _id: 0, googleId:0, hash: 0 } } )
+        .then(result => { res.send(result) })
+    })  
     return app
 }
 

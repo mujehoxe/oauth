@@ -1,7 +1,7 @@
 
 @font-face {
 	font-family: MyriadPro;
-	src: url('MyriadPro.otf');
+    src: url('./MyriadPro.otf');
     font-weight: bold;
     font-display: fallback;
 }
@@ -12,47 +12,45 @@ body, html {
   background-color: black;
 }
 
-.button {
+body {
+    display: flex;
+}
+
+.Right{
+  background-color: white;
+  justify-self: right;
+  width:50%;
+  height:100vh;
+}
+
+.Left{
+  width:50%;
+  height:100vh;
+  justify-self: left;
+}
+
+.Button {
     font-size: calc(2vh + 10px);
-    color: silver;
+    color: #c0c0c0;
     border: unset;
     background: unset;
     text-align: left;
     font-family: MyriadPro;
     padding:0;
     text-decoration: none;
+    padding: 5pt 5pt;
+    border-bottom: transparent solid 2px
 }
-.button:active {
+.Button:hover {
     text-decoration: none;
-    fill: lightblue solid 2px;
-    fill-opacity: 50%;
-}
-.button:hover {
-    text-decoration: none;
-    border: lightblue solid 2px
+    border-bottom: rgb(100, 120, 150) solid 2px
 }
 
 .Paragraph {
-	font-family: MyriadPro;
-	line-height: 1.2;
+    font-family: MyriadPro;
+    line-height: 1.2;
     text-align: left;
-    align-self: center;
     margin-left: 10vh;
-	color: white;
+    color: white;
     font-size: 14vh;
-}
-
-.Credentials{
-    
-    border: unset;
-    border-bottom: solid #708090 2px;
-
-    color: slategrey;
-    
-    font-size: calc(1vh + 10px);
-    font-family: MyriadPro;       
-}
-.Credentials::placeholder{
-    color: slategrey;
-    opacity: .9;
 }

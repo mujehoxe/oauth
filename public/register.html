@@ -5,28 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <link rel="stylesheet" href="css/shared.css">
-    <link rel="stylesheet" href="css/lognin.css">
+    <link rel="stylesheet" href="css/form.css">
 </head>
 <body>
 
-    <p class="Paragraph">
-        Register
-    </p>
+    <div class="Left">
+        <p class="Paragraph">
+            Register
+        </p>
+        <p class="Paragraph" style="font-size: calc(2vh + 10px); color: #c0c0c0;">
+            Join our website.
+        </p>
+    </div>
 
-    <div class="form">
+    <div class="Form Right">
 
         <input id="username" type="text" class="Credentials" placeholder="Username">
         <input id="email" type="email" class="Credentials" placeholder="Email">
         <input type="password" class="Credentials" id="password" placeholder="Password">
         <input type="password" class="Credentials" id="ConfimPassword" placeholder="Confirm your password">            
         
-        <button id="submit" class="button" style="justify-self: end;">SignUp</button>
+        <button id="submit" class="Button" style="justify-self: end;">SignUp</button>
   
-        <a href='login.html' class="Paragraph" style="font-size: 3vh;color: rgb(100, 120, 150);margin: 0;">
-            Don't have an account, join here.
+        <a href='/login' class="Paragraph" style="font-size: 3vh;color: rgb(100, 120, 150);margin: 0;">
+            Already have an account, login here.
         </a>
         <a href='/auth/google' class="Paragraph" style="font-size: 3vh;color: rgb(100, 120, 150);margin: 0;">
-            Use Google.
+            Continue using Google.
         </a> 
     
     </div>

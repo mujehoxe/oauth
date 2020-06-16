@@ -5,12 +5,12 @@ const MongoStore = require('connect-mongo')(session);
 
 
 module.exports = session({
-    secret: 'keyboard cat',
-    cookie: { maxAge: 60000 *60*24 *2},
+    secret: 'super secret key',
+    cookie: { maxAge: 60000 *60*24 *10},
     saveUninitialized: false,
     resave: false,
     store: new MongoStore({
-        url: 'mongodb://localhost/chess',
+        url: 'mongodb://localhost/oauth',
         autoRemove: 'native',
     })
 })
