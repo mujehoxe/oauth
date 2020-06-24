@@ -171,8 +171,6 @@ module.exports = function(app, db) {
             'http://127.0.0.1:3000/auth/google/callback'
         )
         const scopes = [
-            'https://www.googleapis.com/auth/userinfo.profile',
-            'https://www.googleapis.com/auth/userinfo.email',
             'openid'
         ]
         
@@ -185,6 +183,42 @@ module.exports = function(app, db) {
             })
         })
         res.redirect(302,url)
+    })
+
+    app.get('/auth/google/callback', loggedIn, async (req, res) => {
+        const code = req.query.code
+        
+        const oauthClient = new google.auth.OAuth2(
+            '374495845688-8ra0nksfosq5s6p91kj7pe40arass74p.apps.googleusercontent.com',
+            'LSE0vXnUaV7_NjTCjnZ6rXJq',
+            'http://127.0.0.1:3000/auth/google/callback'
+        )
+        const response = await oauthClient.getToken(code)
+        const { tokens } = response
+        const token = tokens.id_token.split('.')
+        const data = JSON.parse(Buffer.from(token[1], 'base64'))
+        console.log(tokens)
+        
+        try { 
+            if(data) {
+                const { googleId, email, picture } = data
+
+                db.collection('users').findOneAndUpdate(
+                { googleId: googleId },
+                { $setOnInsert: { googleId, email, picture} },
+                { upsert: true, returnOriginal: false}
+                ,
+                function(err, doc) {
+                    if (err) { throw err }
+                    req.session.userId = doc.value._id
+                    req.session.save()
+                    res.redirect(302,'/dashboard')
+                })
+            }
+        } catch (error) {
+            console.log(error)
+            res.redirect(302,'/registration')
+        }      
     })
 
     app.get('/contact/google', loggedOut,  (req, res) => {
@@ -203,49 +237,6 @@ module.exports = function(app, db) {
             })
         })
         res.send(url)
-    })
-
-    app.get('/auth/google/callback', loggedIn, async (req, res) => {
-        const code = req.query.code
-        
-        const oauthClient = new google.auth.OAuth2(
-            '374495845688-8ra0nksfosq5s6p91kj7pe40arass74p.apps.googleusercontent.com',
-            'LSE0vXnUaV7_NjTCjnZ6rXJq',
-            'http://127.0.0.1:3000/auth/google/callback'
-        )
-        
-        const { tokens } = await oauthClient.getToken(code) 
-        
-        try {
-            const {data} = await axios({
-                method: 'GET',
-                headers:{
-                    authorization: 'Bearer ' + tokens.access_token,
-                },
-                'Content-Type': 'application/json',
-                url: 'https://www.googleapis.com/oauth2/v3/userinfo'
-                })
-    
-                if(data) {
-                    const { googleId, email, picture } = data
-
-                    db.collection('users').findOneAndUpdate(
-                    { googleId: googleId },
-                    { $setOnInsert: { googleId, email, picture} },
-                    { upsert: true, returnOriginal: false}
-                    ,
-                    function(err, doc) {
-                        if (err) { throw err }
-                        req.session.userId = doc.value._id
-                        req.session.save()
-                        res.redirect(302,'/dashboard')
-                    }
-                )
-            }
-        } catch (error) {
-            console.log(error)
-            res.redirect(302,'/registration')
-        }      
     })
 
     app.get('/contact/google/callback', loggedOut, async (req, res) => {
