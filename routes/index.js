@@ -7,8 +7,6 @@ const verifyRegistration = require('./verifyRegistration.js')
 
 const verifyLogin = require('./verifyLogin.js')
 
-const passport = require('../passport')
-
 const ObjectId = require('mongodb').ObjectId
 
 const { google } = require('googleapis')
@@ -114,7 +112,6 @@ module.exports = function(app, db) {
             const result = await createUser(db, username, email, hash)
             req.session.userId = result.ops[0]._id
             req.session.save()
-            console.log(req.session.userId)
             res.redirect(302,'/dashboard')
         } catch (err) {
             console.log(err)
@@ -167,9 +164,6 @@ module.exports = function(app, db) {
         })
     })
 
-    app.use(passport.initialize());
-    app.use(passport.session());
-
     app.get('/auth/google', loggedIn, (req, res) => {
         const oauthClient = new google.auth.OAuth2(
             '374495845688-8ra0nksfosq5s6p91kj7pe40arass74p.apps.googleusercontent.com',
@@ -181,6 +175,7 @@ module.exports = function(app, db) {
             'https://www.googleapis.com/auth/userinfo.email',
             'openid'
         ]
+        
         const url = oauthClient.generateAuthUrl({
             access_type: 'offline',
             scope: scopes,
@@ -212,13 +207,14 @@ module.exports = function(app, db) {
 
     app.get('/auth/google/callback', loggedIn, async (req, res) => {
         const code = req.query.code
+        
         const oauthClient = new google.auth.OAuth2(
             '374495845688-8ra0nksfosq5s6p91kj7pe40arass74p.apps.googleusercontent.com',
             'LSE0vXnUaV7_NjTCjnZ6rXJq',
             'http://127.0.0.1:3000/auth/google/callback'
         )
         
-        const { tokens } = await oauthClient.getToken(code)
+        const { tokens } = await oauthClient.getToken(code) 
         
         try {
             const {data} = await axios({
