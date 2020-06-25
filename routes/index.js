@@ -159,7 +159,9 @@ module.exports = function(app, db) {
     app.get('/logout', loggedOut, (req, res) => {
         db.collection('sessions').deleteOne({ session: JSON.stringify(req.session) } , true)
         .then(doc => {
+            console.log(req.session)
             req.session.userId = null
+            req.session.save()  
             res.send('success')
         })
     })
@@ -171,6 +173,8 @@ module.exports = function(app, db) {
             'http://127.0.0.1:3000/auth/google/callback'
         )
         const scopes = [
+            'https://www.googleapis.com/auth/userinfo.profile',
+            'https://www.googleapis.com/auth/userinfo.email',
             'openid'
         ]
         
@@ -197,15 +201,15 @@ module.exports = function(app, db) {
         const { tokens } = response
         const token = tokens.id_token.split('.')
         const data = JSON.parse(Buffer.from(token[1], 'base64'))
-        console.log(tokens)
+        console.log(data)
         
         try { 
             if(data) {
-                const { googleId, email, picture } = data
+                const { sub, email, picture } = data
 
                 db.collection('users').findOneAndUpdate(
-                { googleId: googleId },
-                { $setOnInsert: { googleId, email, picture} },
+                { sub: sub },
+                { $setOnInsert: { sub, email, picture} },
                 { upsert: true, returnOriginal: false}
                 ,
                 function(err, doc) {
