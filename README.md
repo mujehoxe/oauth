@@ -24,6 +24,8 @@ Or Download and extract the zip file at [OAuth](https://github.com/mujehoxe/oaut
 
 ### Running
 
+Make sure that npm, node and mongod are in the environment variables.
+
 Change Directory to the repository distination
 ```
 cd <repository distination>
@@ -32,6 +34,11 @@ cd <repository distination>
 Run node package manager (NPM) installation
 ```
 npm install
+```
+
+Run MongoDB server
+```
+mongod
 ```
 
 Run project
