@@ -22,6 +22,7 @@ module.exports = function(app, db) {
     const loggedIn = function (req, res, next) {
         if(req.session.userId){
             res.redirect('/dashboard')
+            console.log(req.session)
             return
         }
         next()
@@ -137,19 +138,18 @@ module.exports = function(app, db) {
 
         db.collection('users').find({ $or: [{email: email_user},{username: email_user}] })
         .toArray().then(result => {
-            const user = result[0]
-            const salt = bcrypt.getSalt(user.hash)
-            const hash = bcrypt.hashSync(password, salt)
-            
-            if(user.email == email_user || user.username == email_user){
-                
-                if(user.hash === hash){
-                    req.session.userId = user._id
-                    req.session.save()
-                    res.redirect(302,'/dashboard')
-                    return
-                }
-            }
+        	if(result.length != 0){
+		        const user = result[0]
+		        const salt = bcrypt.getSalt(user.hash)
+		        const hash = bcrypt.hashSync(password, salt)
+		        	
+		        if(user.hash === hash){
+		            req.session.userId = user._id
+		            req.session.save()
+		        	res.redirect(302,'/dashboard')
+		            return
+		        }
+		    }
             errors.push({"msg":"Credentials didn't match our records.", "param":"credentials", "location":"body"})
             return res.status(422).json(errors)
         })
@@ -196,7 +196,6 @@ module.exports = function(app, db) {
         const { tokens } = response
         const token = tokens.id_token.split('.')
         const data = JSON.parse(Buffer.from(token[1], 'base64'))
-        console.log(data)
         
         try { 
             if(data) {
