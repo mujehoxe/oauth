@@ -157,13 +157,8 @@ module.exports = function(app, db) {
     })
 
     app.get('/logout', loggedOut, (req, res) => {
-        db.collection('sessions').deleteOne({ session: JSON.stringify(req.session) } , true)
-        .then(doc => {
-            console.log(req.session)
-            req.session.userId = null
-            req.session.save()  
-            res.send('success')
-        })
+	    req.session.destroy()
+	    res.send('success')
     })
 
     app.get('/auth/google', loggedIn, (req, res) => {
