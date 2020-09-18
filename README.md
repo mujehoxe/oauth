@@ -28,7 +28,7 @@ Make sure that npm, node and mongod are in the environment variables.
 
 Change Directory to the repository distination
 ```
-cd <repository distination>
+cd <repository destination>
 ```
 
 Run node package manager (NPM) installation
